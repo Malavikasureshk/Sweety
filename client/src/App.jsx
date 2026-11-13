@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Auth from './Auth';
+import Readings from './Readings';
 
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
@@ -24,10 +25,15 @@ export default function App() {
   }
 
   return (
-    <div className="card">
-      <h1>Welcome, {user?.name}</h1>
-      <p className="muted">Readings screen coming next.</p>
-      <button onClick={handleLogout}>Log out</button>
-    </div>
+    <>
+      <div className="card header">
+        <div>
+          <h1>Sweety</h1>
+          <p className="muted">Hi, {user?.name}</p>
+        </div>
+        <button onClick={handleLogout}>Log out</button>
+      </div>
+      <Readings token={token} />
+    </>
   );
 }
