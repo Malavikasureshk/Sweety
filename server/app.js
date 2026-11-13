@@ -3,6 +3,7 @@ const cors = require('cors');
 const pool = require('./db');
 const authRoutes = require('./routes/auth');
 const readingsRoutes = require('./routes/readings');
+const reportsRoutes = require('./routes/reports');
 
 const app = express();
 app.use(cors());
@@ -19,5 +20,6 @@ app.get('/health', async (req, res) => {
 
 app.use('/auth', authRoutes);
 app.use('/readings', readingsRoutes);
+app.use('/reports', reportsRoutes);
 
 module.exports = app;
