@@ -116,3 +116,56 @@ button.small {
   padding: 5px 10px;
   font-size: 13px;
 }
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+button.tab {
+  background: #e5e7eb;
+  color: #1f2937;
+}
+
+button.tab.active {
+  background: #2563eb;
+  color: white;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin: 12px 0 4px;
+}
+
+.stats div {
+  background: #f4f6fb;
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+}
+
+.stat-label {
+  display: block;
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.stats strong {
+  font-size: 20px;
+}
+
+.small-text {
+  font-size: 12px;
+  margin: 4px 0 8px;
+}
+
+.empty-state {
+  background: #f4f6fb;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  color: #6b7280;
+}
