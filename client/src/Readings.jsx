@@ -19,6 +19,7 @@ export default function Readings({ token }) {
   const [date, setDate] = useState(todayString());
   const [slot, setSlot] = useState('morning');
   const [value, setValue] = useState('');
+  const [editingId, setEditingId] = useState(null);
   const [readings, setReadings] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -39,16 +40,50 @@ export default function Readings({ token }) {
     loadReadings();
   }, [loadReadings]);
 
-  async function handleAdd(e) {
+  function resetForm() {
+    setEditingId(null);
+    setSlot('morning');
+    setValue('');
+    setError('');
+  }
+
+  async function handleSubmit(e) {
     e.preventDefault();
     setError('');
     try {
-      await api('/readings', {
-        method: 'POST',
-        token,
-        body: { reading_date: date, slot, value },
-      });
-      setValue('');
+      if (editingId) {
+        await api(`/readings/${editingId}`, {
+          method: 'PUT',
+          token,
+          body: { reading_date: date, slot, value },
+        });
+      } else {
+        await api('/readings', {
+          method: 'POST',
+          token,
+          body: { reading_date: date, slot, value },
+        });
+      }
+      resetForm();
+      await loadReadings();
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
+  function startEdit(reading) {
+    setEditingId(reading.id);
+    setSlot(reading.slot);
+    setValue(String(reading.value));
+    setError('');
+  }
+
+  async function handleDelete(id) {
+    if (!window.confirm('Delete this reading?')) return;
+    setError('');
+    try {
+      await api(`/readings/${id}`, { method: 'DELETE', token });
+      if (editingId === id) resetForm();
       await loadReadings();
     } catch (err) {
       setError(err.message);
@@ -62,8 +97,8 @@ export default function Readings({ token }) {
   return (
     <>
       <div className="card">
-        <h2>Add a reading</h2>
-        <form onSubmit={handleAdd}>
+        <h2>{editingId ? 'Edit reading' : 'Add a reading'}</h2>
+        <form onSubmit={handleSubmit}>
           <label>
             Date
             <input
@@ -72,7 +107,7 @@ export default function Readings({ token }) {
               max={todayString()}
               onChange={(e) => {
                 setDate(e.target.value);
-                setError('');
+                resetForm();
               }}
             />
           </label>
@@ -98,7 +133,14 @@ export default function Readings({ token }) {
 
           {error && <p className="error">{error}</p>}
 
-          <button type="submit">Add reading</button>
+          <div className="actions">
+            <button type="submit">{editingId ? 'Save changes' : 'Add reading'}</button>
+            {editingId && (
+              <button type="button" className="secondary" onClick={resetForm}>
+                Cancel
+              </button>
+            )}
+          </div>
         </form>
       </div>
 
@@ -113,7 +155,15 @@ export default function Readings({ token }) {
             {readings.map((r) => (
               <li key={r.id}>
                 <span>{slotLabel(r.slot)}</span>
-                <strong>{r.value} mg/dl</strong>
+                <span className="reading-right">
+                  <strong>{r.value} mg/dl</strong>
+                  <button type="button" className="secondary small" onClick={() => startEdit(r)}>
+                    Edit
+                  </button>
+                  <button type="button" className="danger small" onClick={() => handleDelete(r.id)}>
+                    Delete
+                  </button>
+                </span>
               </li>
             ))}
           </ul>
